@@ -161,7 +161,7 @@
     <div class="row-2">
       <div>
         <label>GitHub 계정 / 소유자</label>
-        <input type="text" id="owner" placeholder="예: wonyoon75-lab">
+        <input type="text" id="owner" placeholder="예: jjabroin">
       </div>
       <div>
         <label>저장소 이름</label>
@@ -172,7 +172,9 @@
     <input type="text" id="branch" value="main">
     <label>Personal Access Token (PAT)</label>
     <input type="password" id="pat" placeholder="ghp_...">
-    <p class="hint">토큰은 이 브라우저에만 임시 저장되며(sessionStorage), 서버로 전송되지 않습니다. 탭을 닫으면 사라집니다.</p>
+    <p class="hint">저장소 정보와 토큰은 이 브라우저에 계속 저장되어(localStorage), 다음에 열 때 자동으로 채워집니다. 서버로는 전송되지 않지만, 같은 기기를 쓰는 다른 사람도 접근할 수 있으니 공용 컴퓨터에서는 사용 후 지우는 걸 권장합니다.</p>
+    <button class="primary-btn" id="connectBtn" style="margin-top:10px;">연결 확인</button>
+    <div class="status" id="connectStatus"></div>
   </div>
 
   <div class="card">
@@ -214,14 +216,13 @@
 const $ = id => document.getElementById(id);
 const ownerEl = $('owner'), repoEl = $('repo'), branchEl = $('branch'), patEl = $('pat');
 
-// 세션에 연결 정보 임시 저장
+// 연결 정보를 이 브라우저에 계속 저장 (다음 방문 시 자동으로 채워짐)
 ['owner','repo','branch','pat'].forEach(id => {
   const el = $(id);
-  const saved = sessionStorage.getItem('admin_'+id);
+  const saved = localStorage.getItem('admin_'+id);
   if(saved) el.value = saved;
   el.addEventListener('input', () => {
-    sessionStorage.setItem('admin_'+id, el.value);
-    if(id !== 'pat') loadMaterialsDebounced();
+    localStorage.setItem('admin_'+id, el.value);
   });
 });
 
@@ -439,6 +440,45 @@ async function handleDelete(items, idx){
     alert(`삭제 실패: ${e.message}`);
   }
 }
+
+function setConnectStatus(msg, kind){
+  const el = $('connectStatus');
+  el.textContent = msg;
+  el.className = 'status' + (kind ? ' ' + kind : '');
+}
+
+$('connectBtn').addEventListener('click', async () => {
+  if(!ownerEl.value.trim() || !repoEl.value.trim() || !patEl.value.trim()){
+    setConnectStatus('소유자, 저장소, 토큰을 모두 입력하세요.', 'error');
+    return;
+  }
+  $('connectBtn').disabled = true;
+  setConnectStatus('확인 중...');
+  try{
+    const branch = branchEl.value.trim() || 'main';
+    const res = await fetch(`https://api.github.com/repos/${ownerEl.value.trim()}/${repoEl.value.trim()}`, { headers: authHeaders() });
+    if(res.status === 404){
+      throw new Error('저장소를 찾을 수 없습니다. 소유자/저장소 이름을 확인하세요.');
+    }
+    if(res.status === 401){
+      throw new Error('토큰이 올바르지 않습니다.');
+    }
+    if(!res.ok){
+      throw new Error(`연결 실패 (${res.status})`);
+    }
+    const data = await res.json();
+    if(data.default_branch && data.default_branch !== branch){
+      setConnectStatus(`연결 성공. 참고: 이 저장소의 기본 브랜치는 "${data.default_branch}"입니다.`, 'ok');
+    } else {
+      setConnectStatus('연결 성공.', 'ok');
+    }
+    loadMaterials();
+  } catch(e){
+    setConnectStatus(e.message || '연결 실패', 'error');
+  } finally {
+    $('connectBtn').disabled = false;
+  }
+});
 
 let debounceTimer;
 function loadMaterialsDebounced(){
