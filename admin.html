@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>자료 관리</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<style>
+  :root{
+    --bg:#F6F5F1;
+    --surface:#FFFFFF;
+    --ink:#1E1E1C;
+    --ink-soft:#767469;
+    --accent:#2B5D5A;
+    --accent-soft:#E4ECEA;
+    --border:#E4E1D6;
+    --danger:#B3453D;
+    --danger-soft:#F5E7E5;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Pretendard', -apple-system, sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  #app{
+    max-width:560px;
+    margin:0 auto;
+    padding:36px 20px 80px;
+  }
+  h1{
+    font-size:20px;
+    font-weight:700;
+    margin:0 0 4px;
+  }
+  .subtitle{
+    margin:0 0 28px;
+    font-size:14px;
+    color:var(--ink-soft);
+  }
+  .card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:20px;
+    margin-bottom:20px;
+  }
+  .card h2{
+    font-size:14px;
+    font-weight:700;
+    margin:0 0 14px;
+    color:var(--accent);
+  }
+  label{
+    display:block;
+    font-size:13px;
+    font-weight:600;
+    margin:14px 0 6px;
+  }
+  label:first-of-type{margin-top:0;}
+  input[type=text], input[type=password], select, textarea{
+    width:100%;
+    font-family:inherit;
+    font-size:14px;
+    padding:10px 12px;
+    border:1px solid var(--border);
+    border-radius:8px;
+    background:var(--bg);
+    color:var(--ink);
+  }
+  input[type=file]{
+    width:100%;
+    font-family:inherit;
+    font-size:13px;
+  }
+  textarea{
+    min-height:160px;
+    font-family:'SFMono-Regular', Consolas, monospace;
+    font-size:13px;
+    resize:vertical;
+  }
+  .row-2{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+  }
+  .hint{
+    font-size:12px;
+    color:var(--ink-soft);
+    margin-top:6px;
+  }
+  button{
+    font-family:inherit;
+    cursor:pointer;
+  }
+  .primary-btn{
+    width:100%;
+    margin-top:18px;
+    padding:13px;
+    font-size:14px;
+    font-weight:700;
+    color:#fff;
+    background:var(--accent);
+    border:none;
+    border-radius:9px;
+  }
+  .primary-btn:disabled{
+    opacity:.5;
+    cursor:default;
+  }
+  .status{
+    margin-top:12px;
+    font-size:13px;
+    line-height:1.5;
+  }
+  .status.error{ color:var(--danger); }
+  .status.ok{ color:var(--accent); }
+  .type-fields{ display:none; }
+  .type-fields.active{ display:block; }
+  .material-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:12px 0;
+    border-bottom:1px solid var(--border);
+    font-size:14px;
+  }
+  .material-row:last-child{ border-bottom:none; }
+  .material-meta{
+    font-size:12px;
+    color:var(--ink-soft);
+    margin-top:2px;
+  }
+  .delete-btn{
+    flex-shrink:0;
+    background:var(--danger-soft);
+    color:var(--danger);
+    border:none;
+    border-radius:7px;
+    padding:7px 10px;
+    font-size:12px;
+    font-weight:600;
+  }
+  .empty-note{
+    color:var(--ink-soft);
+    font-size:13px;
+    padding:8px 0;
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <h1>자료 관리</h1>
+  <p class="subtitle">수업 자료를 업로드하고 관리합니다.</p>
+
+  <div class="card">
+    <h2>저장소 연결</h2>
+    <div class="row-2">
+      <div>
+        <label>GitHub 계정 / 소유자</label>
+        <input type="text" id="owner" placeholder="예: jjabroin">
+      </div>
+      <div>
+        <label>저장소 이름</label>
+        <input type="text" id="repo" placeholder="예: class-materials">
+      </div>
+    </div>
+    <label>브랜치</label>
+    <input type="text" id="branch" value="main">
+    <label>Personal Access Token (PAT)</label>
+    <input type="password" id="pat" placeholder="ghp_...">
+    <p class="hint">토큰은 이 브라우저에만 임시 저장되며(sessionStorage), 서버로 전송되지 않습니다. 탭을 닫으면 사라집니다.</p>
+  </div>
+
+  <div class="card">
+    <h2>새 자료 등록</h2>
+    <label>제목</label>
+    <input type="text" id="title" placeholder="예: 이차함수 그래프">
+
+    <label>자료 유형</label>
+    <select id="type">
+      <option value="html-paste">HTML 코드 직접 입력</option>
+      <option value="html-file">HTML 파일 업로드</option>
+      <option value="pdf-file">PDF 업로드</option>
+    </select>
+
+    <div class="type-fields active" data-type="html-paste">
+      <label>HTML 코드</label>
+      <textarea id="htmlCode" placeholder="<!DOCTYPE html>..."></textarea>
+    </div>
+    <div class="type-fields" data-type="html-file">
+      <label>HTML 파일</label>
+      <input type="file" id="htmlFile" accept=".html,.htm">
+    </div>
+    <div class="type-fields" data-type="pdf-file">
+      <label>PDF 파일</label>
+      <input type="file" id="pdfFile" accept=".pdf">
+    </div>
+
+    <button class="primary-btn" id="submitBtn">자료 등록</button>
+    <div class="status" id="submitStatus"></div>
+  </div>
+
+  <div class="card">
+    <h2>등록된 자료</h2>
+    <div id="materialList"><div class="empty-note">불러오려면 저장소 정보를 입력하세요.</div></div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const ownerEl = $('owner'), repoEl = $('repo'), branchEl = $('branch'), patEl = $('pat');
+
+// 세션에 연결 정보 임시 저장
+['owner','repo','branch','pat'].forEach(id => {
+  const el = $(id);
+  const saved = sessionStorage.getItem('admin_'+id);
+  if(saved) el.value = saved;
+  el.addEventListener('input', () => {
+    sessionStorage.setItem('admin_'+id, el.value);
+    if(id !== 'pat') loadMaterialsDebounced();
+  });
+});
+
+function utf8ToBase64(str){
+  return btoa(unescape(encodeURIComponent(str)));
+}
+function base64ToUtf8(str){
+  return decodeURIComponent(escape(atob(str)));
+}
+function fileToBase64(file){
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+function pad(n){ return String(n).padStart(2,'0'); }
+function sanitizeTitleForFilename(title){
+  return title.trim().replace(/[\\/:*?"<>|]/g, '').replace(/\s+/g, '_');
+}
+
+function apiBase(){
+  return `https://api.github.com/repos/${ownerEl.value.trim()}/${repoEl.value.trim()}/contents`;
+}
+function authHeaders(){
+  return {
+    'Authorization': `token ${patEl.value.trim()}`,
+    'Accept': 'application/vnd.github+json'
+  };
+}
+
+// 자료 유형 전환
+$('type').addEventListener('change', () => {
+  const val = $('type').value;
+  document.querySelectorAll('.type-fields').forEach(el => {
+    el.classList.toggle('active', el.dataset.type === val);
+  });
+});
+
+async function getIndexJson(){
+  const branch = branchEl.value.trim() || 'main';
+  const res = await fetch(`${apiBase()}/materials/index.json?ref=${branch}`, { headers: authHeaders() });
+  if(res.status === 404){
+    return { items: [], sha: null };
+  }
+  if(!res.ok) throw new Error(`index.json을 불러오지 못했습니다 (${res.status})`);
+  const data = await res.json();
+  const items = JSON.parse(base64ToUtf8(data.content));
+  return { items, sha: data.sha };
+}
+
+async function putFile(path, base64Content, message, sha){
+  const branch = branchEl.value.trim() || 'main';
+  const body = { message, content: base64Content, branch };
+  if(sha) body.sha = sha;
+  const res = await fetch(`${apiBase()}/${path}`, {
+    method: 'PUT',
+    headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  if(!res.ok){
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || `업로드 실패 (${res.status})`);
+  }
+  return res.json();
+}
+
+async function deleteFile(path, sha, message){
+  const branch = branchEl.value.trim() || 'main';
+  const res = await fetch(`${apiBase()}/${path}`, {
+    method: 'DELETE',
+    headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message, sha, branch })
+  });
+  if(!res.ok){
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || `삭제 실패 (${res.status})`);
+  }
+}
+
+async function getFileSha(path){
+  const branch = branchEl.value.trim() || 'main';
+  const res = await fetch(`${apiBase()}/${path}?ref=${branch}`, { headers: authHeaders() });
+  if(!res.ok) throw new Error(`파일 정보를 불러오지 못했습니다 (${res.status})`);
+  const data = await res.json();
+  return data.sha;
+}
+
+function setStatus(msg, kind){
+  const el = $('submitStatus');
+  el.textContent = msg;
+  el.className = 'status' + (kind ? ' ' + kind : '');
+}
+
+$('submitBtn').addEventListener('click', async () => {
+  const title = $('title').value.trim();
+  const type = $('type').value;
+
+  if(!ownerEl.value.trim() || !repoEl.value.trim() || !patEl.value.trim()){
+    setStatus('저장소 정보와 토큰을 먼저 입력하세요.', 'error');
+    return;
+  }
+  if(!title){
+    setStatus('제목을 입력하세요.', 'error');
+    return;
+  }
+
+  let contentBase64, ext, materialType;
+  try{
+    if(type === 'html-paste'){
+      const code = $('htmlCode').value;
+      if(!code.trim()){ setStatus('HTML 코드를 입력하세요.', 'error'); return; }
+      contentBase64 = utf8ToBase64(code);
+      ext = 'html'; materialType = 'html';
+    } else if(type === 'html-file'){
+      const file = $('htmlFile').files[0];
+      if(!file){ setStatus('HTML 파일을 선택하세요.', 'error'); return; }
+      contentBase64 = await fileToBase64(file);
+      ext = 'html'; materialType = 'html';
+    } else {
+      const file = $('pdfFile').files[0];
+      if(!file){ setStatus('PDF 파일을 선택하세요.', 'error'); return; }
+      contentBase64 = await fileToBase64(file);
+      ext = 'pdf'; materialType = 'pdf';
+    }
+  } catch(e){
+    setStatus('파일을 읽는 중 오류가 발생했습니다.', 'error');
+    return;
+  }
+
+  const now = new Date();
+  const dateStr = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;
+  const timeStr = `${pad(now.getHours())}${pad(now.getMinutes())}`;
+  const filename = `${dateStr}_${timeStr}_${sanitizeTitleForFilename(title)}.${ext}`;
+
+  $('submitBtn').disabled = true;
+  setStatus('업로드 중...');
+
+  try{
+    await putFile(`materials/${filename}`, contentBase64, `자료 등록: ${title}`);
+
+    const { items, sha } = await getIndexJson();
+    items.unshift({
+      filename,
+      title,
+      date: now.toISOString(),
+      type: materialType
+    });
+    await putFile('materials/index.json', utf8ToBase64(JSON.stringify(items, null, 2)), `목록 갱신: ${title}`, sha);
+
+    setStatus('등록되었습니다.', 'ok');
+    $('title').value = '';
+    $('htmlCode').value = '';
+    $('htmlFile').value = '';
+    $('pdfFile').value = '';
+    loadMaterials();
+  } catch(e){
+    setStatus(e.message || '등록 중 오류가 발생했습니다.', 'error');
+  } finally {
+    $('submitBtn').disabled = false;
+  }
+});
+
+function formatDateTime(iso){
+  const d = new Date(iso);
+  if(isNaN(d)) return iso;
+  return `${d.getMonth()+1}월 ${d.getDate()}일 ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+async function loadMaterials(){
+  const listEl = $('materialList');
+  if(!ownerEl.value.trim() || !repoEl.value.trim() || !patEl.value.trim()){
+    listEl.innerHTML = '<div class="empty-note">불러오려면 저장소 정보를 입력하세요.</div>';
+    return;
+  }
+  listEl.innerHTML = '<div class="empty-note">불러오는 중...</div>';
+  try{
+    const { items } = await getIndexJson();
+    if(!items.length){
+      listEl.innerHTML = '<div class="empty-note">등록된 자료가 없습니다.</div>';
+      return;
+    }
+    listEl.innerHTML = items.map((item, idx) => `
+      <div class="material-row">
+        <div>
+          <div>${item.title}</div>
+          <div class="material-meta">${formatDateTime(item.date)} · ${item.type === 'pdf' ? 'PDF' : 'HTML'}</div>
+        </div>
+        <button class="delete-btn" data-idx="${idx}">삭제</button>
+      </div>
+    `).join('');
+
+    listEl.querySelectorAll('.delete-btn').forEach(btn => {
+      btn.addEventListener('click', () => handleDelete(items, Number(btn.dataset.idx)));
+    });
+  } catch(e){
+    listEl.innerHTML = `<div class="empty-note">불러오기 실패: ${e.message}</div>`;
+  }
+}
+
+async function handleDelete(items, idx){
+  const item = items[idx];
+  if(!confirm(`"${item.title}" 자료를 삭제할까요?`)) return;
+  try{
+    const fileSha = await getFileSha(`materials/${item.filename}`);
+    await deleteFile(`materials/${item.filename}`, fileSha, `자료 삭제: ${item.title}`);
+
+    const { items: currentItems, sha: indexSha } = await getIndexJson();
+    const updated = currentItems.filter(i => i.filename !== item.filename);
+    await putFile('materials/index.json', utf8ToBase64(JSON.stringify(updated, null, 2)), `목록 갱신: ${item.title} 삭제`, indexSha);
+
+    loadMaterials();
+  } catch(e){
+    alert(`삭제 실패: ${e.message}`);
+  }
+}
+
+let debounceTimer;
+function loadMaterialsDebounced(){
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(loadMaterials, 500);
+}
+
+if(ownerEl.value && repoEl.value && patEl.value) loadMaterials();
+</script>
+</body>
+</html>
