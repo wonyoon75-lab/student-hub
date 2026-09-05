@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mini Almanac — Amazing Animals</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FFF8E9;
+    --ink:#2b2440;
+    --sun:#FFC93C;
+    --sun-deep:#F4A300;
+    --leaf:#3FA796;
+    --leaf-deep:#1F7A6C;
+    --sky:#4E8FE0;
+    --sky-deep:#2E63B8;
+    --berry:#8B5CF6;
+    --berry-deep:#6C3FD1;
+    --coral:#FF6B6B;
+    --coral-deep:#E14545;
+    --tangerine:#FF9F45;
+    --tangerine-deep:#E2792A;
+    --pink:#FF7FAA;
+    --pink-deep:#E85288;
+    --paper:#ffffff;
+    --line:#e9e2cf;
+    --good:#2FAE66;
+    --bad:#E14545;
+    --radius:22px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Nunito',sans-serif;
+    background:
+      radial-gradient(circle at 10% 5%, #FFEFC2 0%, transparent 45%),
+      radial-gradient(circle at 90% 0%, #DCEFFF 0%, transparent 40%),
+      var(--cream);
+    color:var(--ink);
+    padding:18px 14px 60px;
+  }
+  h1,h2,h3,.display{font-family:'Baloo 2',sans-serif;}
+  .wrap{max-width:1200px;margin:0 auto;}
+
+  .masthead{
+    text-align:center;
+    margin-bottom:22px;
+  }
+  .masthead .badge{
+    display:inline-block;
+    background:var(--sun);
+    color:var(--ink);
+    font-family:'Baloo 2',sans-serif;
+    font-weight:800;
+    font-size:13px;
+    letter-spacing:.3px;
+    padding:5px 14px;
+    border-radius:999px;
+    border:2px solid var(--ink);
+    transform:rotate(-2deg);
+    margin-bottom:10px;
+  }
+  .masthead h1{
+    font-size:clamp(28px,5vw,46px);
+    margin:4px 0 6px;
+    color:var(--ink);
+  }
+  .masthead h1 span{color:var(--coral-deep);}
+  .masthead p{
+    margin:0;
+    font-size:15px;
+    color:#5c5470;
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(310px,1fr));
+    gap:18px;
+  }
+
+  .card{
+    background:var(--paper);
+    border-radius:var(--radius);
+    border:2.5px solid var(--ink);
+    box-shadow:6px 6px 0 rgba(43,36,64,0.12);
+    padding:18px 18px 20px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    position:relative;
+  }
+  .card.wide{grid-column:span 2;}
+  @media (max-width:700px){ .card.wide{grid-column:span 1;} }
+
+  .card-head{display:flex;align-items:center;gap:10px;}
+  .num{
+    width:34px;height:34px;min-width:34px;
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Baloo 2',sans-serif;font-weight:800;font-size:16px;
+    color:#fff;
+    border:2px solid var(--ink);
+  }
+  .card h2{font-size:19px;margin:0;line-height:1.15;}
+  .card .sub{font-size:12.5px;color:#6b6280;margin:-6px 0 0 44px;}
+
+  /* color themes */
+  .t-sun .num{background:var(--sun-deep);}
+  .t-leaf .num{background:var(--leaf-deep);}
+  .t-sky .num{background:var(--sky-deep);}
+  .t-berry .num{background:var(--berry-deep);}
+  .t-coral .num{background:var(--coral-deep);}
+  .t-tangerine .num{background:var(--tangerine-deep);}
+  .t-pink .num{background:var(--pink-deep);}
+
+  .panel{
+    border-radius:14px;
+    padding:12px;
+    border:2px solid var(--line);
+  }
+  .t-sun .panel{background:#FFF6DA;border-color:#F0D98C;}
+  .t-leaf .panel{background:#E7F7F1;border-color:#BEE7D8;}
+  .t-sky .panel{background:#EAF3FF;border-color:#C7DEFA;}
+  .t-berry .panel{background:#F2ECFF;border-color:#DBCBFA;}
+  .t-coral .panel{background:#FFEDED;border-color:#F7C9C9;}
+  .t-tangerine .panel{background:#FFF0E1;border-color:#F6D2AC;}
+  .t-pink .panel{background:#FFEAF2;border-color:#F7C4D9;}
+
+  .knowcard{
+    display:flex; gap:10px; align-items:flex-start;
+    background:#fff; border:2px solid var(--line); border-radius:14px; padding:10px;
+    cursor:pointer; transition:transform .15s ease;
+  }
+  .knowcard:hover{transform:translateY(-2px);}
+  .knowcard .emoji{font-size:28px;}
+  .knowcard b{display:block;font-size:14.5px;font-family:'Baloo 2';margin-bottom:2px;}
+  .knowcard p{margin:0;font-size:12.5px;color:#5c5470;display:none;line-height:1.4;}
+  .knowcard.open p{display:block;}
+  .know-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+  .qbox{border:2px solid var(--line);border-radius:14px;padding:10px 12px;background:#fff;}
+  .qbox p.q{margin:0 0 8px;font-weight:700;font-size:14px;}
+  .opts{display:flex;flex-wrap:wrap;gap:8px;}
+  .opt{
+    border:2px solid var(--ink); background:#fff; border-radius:10px;
+    padding:6px 12px; font-family:'Nunito'; font-weight:700; font-size:13.5px;
+    cursor:pointer; transition:all .12s ease;
+  }
+  .opt:hover{transform:translateY(-1px);}
+  .opt.correct{background:var(--good);border-color:var(--good);color:#fff;}
+  .opt.wrong{background:var(--bad);border-color:var(--bad);color:#fff;}
+  .opt[disabled]{cursor:default;}
+  .feedback{font-size:12.5px;font-weight:700;min-height:16px;margin-top:6px;}
+  .feedback.good{color:var(--good);}
+  .feedback.bad{color:var(--bad);}
+
+  .fill-row{display:flex;align-items:center;gap:8px;font-size:13.5px;margin:6px 0;}
+  .fill-row input{
+    border:2px solid var(--ink);border-radius:8px;padding:4px 8px;font-family:'Nunito';font-size:13px;width:130px;
+  }
+  .fill-row .check{
+    border:none;background:var(--leaf-deep);color:#fff;border-radius:8px;padding:5px 10px;
+    font-weight:700;cursor:pointer;font-size:12px;
+  }
+  .fill-row .mark{font-weight:800;font-size:14px;width:18px;}
+
+  .sort-board{display:grid;grid-template-columns:1fr;gap:10px;}
+  .sort-zone{
+    border:2.5px dashed var(--ink); border-radius:14px; padding:10px;
+    min-height:64px; display:flex; gap:8px; flex-wrap:wrap; align-items:center;
+    background:rgba(255,255,255,.6);
+  }
+  .sort-zone .zlabel{
+    font-family:'Baloo 2'; font-weight:700; font-size:13px; width:100%; margin-bottom:2px;
+  }
+  .chip{
+    border:2px solid var(--ink); border-radius:999px; padding:6px 12px;
+    background:#fff; font-weight:700; font-size:13px; cursor:pointer; user-select:none;
+    display:flex; align-items:center; gap:6px;
+  }
+  .chip.placed-good{background:var(--good);color:#fff;}
+  .chip.selected{outline:3px solid var(--sun-deep);}
+  .bank{display:flex;flex-wrap:wrap;gap:8px;padding:10px;border-radius:14px;background:#fff;border:2px solid var(--line);}
+  .hint{font-size:11.5px;color:#7a7190;margin-top:2px;}
+
+  .guess-animals{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+  .g-animal{
+    border:2px solid var(--ink);border-radius:12px;padding:10px 4px;text-align:center;
+    background:#fff;cursor:pointer;font-weight:700;font-size:12.5px;
+  }
+  .g-animal .emoji{font-size:26px;display:block;}
+  .g-animal.right{background:var(--good);color:#fff;}
+  .g-animal.wrong{opacity:.35;}
+  .qtool{
+    border:2px solid var(--berry-deep);background:#fff;color:var(--berry-deep);
+    border-radius:999px;padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer;margin:3px 4px 0 0;
+  }
+  .qtool:disabled{opacity:.4;cursor:default;}
+  .log{background:#fff;border:2px solid var(--line);border-radius:12px;padding:8px 10px;min-height:70px;font-size:12.5px;line-height:1.5;}
+
+  .btn{
+    border:none;border-radius:999px;padding:8px 16px;font-weight:800;font-family:'Baloo 2';
+    cursor:pointer;font-size:14px;color:#fff;
+  }
+  .btn-leaf{background:var(--leaf-deep);}
+  .btn-sky{background:var(--sky-deep);}
+  .btn-berry{background:var(--berry-deep);}
+  .btn-coral{background:var(--coral-deep);}
+  .btn-tangerine{background:var(--tangerine-deep);}
+  .btn-pink{background:var(--pink-deep);}
+  .btn-sun{background:var(--sun-deep);}
+  .btn:active{transform:translateY(1px);}
+
+  .dice-row{display:flex;align-items:center;gap:14px;}
+  .die{
+    width:56px;height:56px;border:3px solid var(--ink);border-radius:14px;
+    background:#fff;display:flex;align-items:center;justify-content:center;
+    font-family:'Baloo 2';font-weight:800;font-size:26px;
+  }
+  .prompt-line{font-size:14px;font-weight:700;background:#fff;border:2px solid var(--line);border-radius:10px;padding:8px 10px;}
+  .ans-input{width:100%;border:2px solid var(--ink);border-radius:10px;padding:7px 10px;font-family:'Nunito';font-size:13.5px;margin-top:6px;}
+
+  table.logic{width:100%;border-collapse:collapse;font-size:12px;background:#fff;border-radius:10px;overflow:hidden;}
+  table.logic th,table.logic td{border:1px solid var(--line);padding:5px 4px;text-align:center;}
+  table.logic th{background:#F4EEFF;font-family:'Baloo 2';}
+  .clue-btn{
+    display:block;width:100%;text-align:left;border:2px solid var(--line);background:#fff;border-radius:10px;
+    padding:7px 10px;font-size:12.5px;margin-top:6px;cursor:pointer;font-weight:600;
+  }
+  .clue-answer{display:none;margin-top:5px;}
+  .clue-btn.open + .clue-answer{display:flex;gap:6px;align-items:center;}
+
+  .country-card{background:#fff;border:2px solid var(--line);border-radius:14px;padding:12px;font-size:13px;line-height:1.75;}
+  .country-card b{font-family:'Baloo 2';}
+  .match-wrap{display:grid;grid-template-columns:1fr 1fr;gap:20px 10px;margin-top:8px;}
+  .match-item{
+    border:2px solid var(--ink);border-radius:10px;padding:7px 10px;background:#fff;
+    font-size:12.5px;font-weight:700;cursor:pointer;text-align:center;
+  }
+  .match-item.sel{background:var(--sun);}
+  .match-item.done{background:var(--good);color:#fff;cursor:default;}
+  .match-col{display:flex;flex-direction:column;gap:10px;}
+
+  .score-pill{
+    display:inline-block;background:var(--tangerine-deep);color:#fff;font-family:'Baloo 2';
+    font-weight:800;font-size:13px;padding:5px 12px;border-radius:999px;
+  }
+
+  .draw-area{border:2.5px dashed var(--ink);border-radius:14px;background:#fff;touch-action:none;width:100%;height:170px;}
+  .draw-tools{display:flex;gap:6px;flex-wrap:wrap;}
+  .swatch{width:22px;height:22px;border-radius:50%;border:2px solid var(--ink);cursor:pointer;}
+  textarea.fact, input.fact{
+    width:100%;border:2px solid var(--ink);border-radius:10px;padding:6px 9px;font-family:'Nunito';font-size:13px;
+  }
+  .facts-list{display:flex;flex-direction:column;gap:6px;}
+
+  footer{
+    max-width:1200px;margin:26px auto 0;background:var(--sky-deep);color:#fff;
+    border-radius:18px;padding:14px 18px;text-align:center;font-family:'Baloo 2';font-weight:700;
+    display:flex;justify-content:center;gap:10px;flex-wrap:wrap;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="masthead">
+    <span class="badge">EXPLORE · LEARN · PLAY</span>
+    <h1>Mini <span>Almanac</span></h1>
+    <p>Today's Topic: Amazing Animals 🦒🐧🐼 — tap, click, and play through every page!</p>
+  </div>
+
+  <div class="grid">
+
+    <!-- 2. KNOW & LEARN -->
+    <div class="card t-leaf">
+      <div class="card-head"><div class="num">2</div><h2>Know &amp; Learn</h2></div>
+      <p class="sub">Tap a card to read about each animal.</p>
+      <div class="know-grid">
+        <div class="knowcard" onclick="this.classList.toggle('open')">
+          <span class="emoji">🐧</span>
+          <div><b>Penguin</b><p>Penguins are birds, but they cannot fly. They can swim very well. They live in cold places.</p></div>
+        </div>
+        <div class="knowcard" onclick="this.classList.toggle('open')">
+          <span class="emoji">🐒</span>
+          <div><b>Monkey</b><p>Monkeys live in jungles. They can climb trees very well. They eat fruit and nuts.</p></div>
+        </div>
+        <div class="knowcard" onclick="this.classList.toggle('open')">
+          <span class="emoji">🐘</span>
+          <div><b>Elephant</b><p>Elephants are the largest land animals. They have long trunks. They are very smart.</p></div>
+        </div>
+        <div class="knowcard" onclick="this.classList.toggle('open')">
+          <span class="emoji">🐰</span>
+          <div><b>Rabbit</b><p>Rabbits have long ears and soft fur. They can run very fast. They eat grass and vegetables.</p></div>
+        </div>
+      </div>
+      <div class="panel">
+        <b style="font-family:'Baloo 2'">💡 Did You Know?</b>
+        <ul style="margin:6px 0 0;padding-left:18px;font-size:12.5px;line-height:1.6;">
+          <li>A penguin can hold its breath under water for 5 minutes!</li>
+          <li>A monkey can jump 4 to 5 meters!</li>
+          <li>An elephant can hear with its feet!</li>
+          <li>A rabbit can move its ears in different directions!</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 3. FIND THE FACTS -->
+    <div class="card t-sun">
+      <div class="card-head"><div class="num">3</div><h2>Find the Facts</h2></div>
+      <p class="sub">Choose the correct answer for each question.</p>
+      <div id="quiz3"></div>
+      <div class="panel">
+        <b style="font-family:'Baloo 2';font-size:13px;">🔎 Find It!</b>
+        <p style="font-size:12px;margin:4px 0 8px;">Write a word you know for each clue.</p>
+        <div class="fill-row">1. an elephant's nose &nbsp;<input placeholder="type here"></div>
+        <div class="fill-row">2. what covers a bird &nbsp;<input placeholder="type here"></div>
+        <div class="fill-row">3. what monkeys do in trees &nbsp;<input placeholder="type here"></div>
+        <div class="fill-row">4. what rabbits eat &nbsp;<input placeholder="type here"></div>
+      </div>
+    </div>
+
+    <!-- 4. SORT IT OUT -->
+    <div class="card t-sky">
+      <div class="card-head"><div class="num">4</div><h2>Sort It Out!</h2></div>
+      <p class="sub">Tap an animal, then tap the box it belongs in.</p>
+      <div class="bank" id="sortBank"></div>
+      <div class="sort-board">
+        <div class="sort-zone" data-zone="fly"><span class="zlabel">🦅 Can Fly</span></div>
+        <div class="sort-zone" data-zone="swim"><span class="zlabel">💧 Can Swim</span></div>
+        <div class="sort-zone" data-zone="cant"><span class="zlabel">🚫 Can't Fly</span></div>
+      </div>
+      <div class="hint" id="sortMsg">Select an animal above, then choose its box.</div>
+      <button class="btn btn-sky" onclick="resetSort()">Reset</button>
+    </div>
+
+    <!-- 5. GUESS WHO -->
+    <div class="card t-berry">
+      <div class="card-head"><div class="num">5</div><h2>Guess Who?</h2></div>
+      <p class="sub">Ask yes/no questions, then guess the animal!</p>
+      <div id="secretMsg" class="hint">A secret animal has been chosen 🤫</div>
+      <div>
+        <button class="qtool" onclick="askQ('fly')">Can it fly?</button>
+        <button class="qtool" onclick="askQ('swim')">Can it swim?</button>
+        <button class="qtool" onclick="askQ('jungle')">Does it live in a jungle?</button>
+        <button class="qtool" onclick="askQ('cold')">Does it live in cold places?</button>
+      </div>
+      <div class="log" id="guessLog">Ask a question to get a clue…</div>
+      <div class="guess-animals" id="guessAnimals"></div>
+      <button class="btn btn-berry" onclick="newSecret()">New Animal</button>
+    </div>
+
+    <!-- 6. DICE GAME -->
+    <div class="card t-leaf">
+      <div class="card-head"><div class="num">6</div><h2>Dice Game</h2></div>
+      <p class="sub">Roll the dice and make a sentence!</p>
+      <div class="dice-row">
+        <div class="die" id="dieFace">🎲</div>
+        <button class="btn btn-leaf" onclick="rollDice()">Roll!</button>
+      </div>
+      <div class="prompt-line" id="dicePrompt">Roll to get your sentence pattern.</div>
+      <input class="ans-input" id="diceAnswer" placeholder="Write your sentence here…">
+    </div>
+
+    <!-- 7. LOGIC TIME -->
+    <div class="card t-pink wide">
+      <div class="card-head"><div class="num">7</div><h2>Logic Time</h2></div>
+      <p class="sub">Read the table, then use the clues to guess each animal.</p>
+      <table class="logic">
+        <tr><th></th><th>🐧 Penguin</th><th>🐒 Monkey</th><th>🐘 Elephant</th><th>🐰 Rabbit</th></tr>
+        <tr><td>Lives in cold places</td><td>✅</td><td>❌</td><td>❌</td><td>❌</td></tr>
+        <tr><td>Lives in jungle</td><td>❌</td><td>✅</td><td>❌</td><td>❌</td></tr>
+        <tr><td>Has long ears</td><td>❌</td><td>❌</td><td>❌</td><td>✅</td></tr>
+        <tr><td>Can swim</td><td>✅</td><td>❌</td><td>❌</td><td>❌</td></tr>
+        <tr><td>Can climb trees</td><td>❌</td><td>✅</td><td>❌</td><td>❌</td></tr>
+      </table>
+      <div id="clues"></div>
+    </div>
+
+    <!-- 8. COUNTRY CORNER -->
+    <div class="card t-sky wide">
+      <div class="card-head"><div class="num">8</div><h2>Country Corner — 🇯🇵 Japan</h2></div>
+      <div class="country-card">
+        <b>Capital:</b> Tokyo &nbsp;·&nbsp; <b>Language:</b> Japanese &nbsp;·&nbsp; <b>People:</b> about 125 million<br>
+        <b>Famous Food:</b> Sushi &nbsp;·&nbsp; <b>Animal:</b> Japanese Macaque (Snow Monkey)<br>
+        <b>Fun Fact:</b> There are hot springs for monkeys!
+      </div>
+      <p class="sub" style="margin-left:0;">Match It! Tap one item on the left, then its pair on the right.</p>
+      <div class="match-wrap">
+        <div class="match-col" id="matchLeft"></div>
+        <div class="match-col" id="matchRight"></div>
+      </div>
+      <div class="hint" id="matchMsg"></div>
+    </div>
+
+    <!-- 9. FUN FACT QUIZ -->
+    <div class="card t-tangerine">
+      <div class="card-head"><div class="num">9</div><h2>Fun Fact Quiz</h2></div>
+      <p class="sub">How much do you remember? <span class="score-pill" id="scorePill">Score: 0 / 4</span></p>
+      <div id="quiz9"></div>
+      <div class="panel">
+        <b style="font-family:'Baloo 2';font-size:13px;">⭐ Bonus</b>
+        <textarea class="fact" style="margin-top:6px;" rows="2" placeholder="Write one fun fact you learned today."></textarea>
+      </div>
+    </div>
+
+    <!-- 10. MAKE YOUR OWN -->
+    <div class="card t-coral">
+      <div class="card-head"><div class="num">10</div><h2>Make Your Own!</h2></div>
+      <p class="sub">Be a little teacher.</p>
+      <div>
+        <label style="font-size:12.5px;font-weight:700;">1. Choose your favorite animal &amp; draw it:</label>
+        <canvas class="draw-area" id="drawCanvas"></canvas>
+        <div class="draw-tools" style="margin-top:6px;">
+          <span class="swatch" style="background:#2b2440" onclick="setColor('#2b2440')"></span>
+          <span class="swatch" style="background:#E14545" onclick="setColor('#E14545')"></span>
+          <span class="swatch" style="background:#2E63B8" onclick="setColor('#2E63B8')"></span>
+          <span class="swatch" style="background:#1F7A6C" onclick="setColor('#1F7A6C')"></span>
+          <span class="swatch" style="background:#E2792A" onclick="setColor('#E2792A')"></span>
+          <button class="btn btn-coral" style="padding:4px 12px;font-size:12px;" onclick="clearCanvas()">Clear</button>
+        </div>
+      </div>
+      <div class="facts-list">
+        <label style="font-size:12.5px;font-weight:700;">2. Write 3 facts about it:</label>
+        <input class="fact" placeholder="Fact 1">
+        <input class="fact" placeholder="Fact 2">
+        <input class="fact" placeholder="Fact 3">
+        <label style="font-size:12.5px;font-weight:700;margin-top:4px;">3. Make a question for your friend:</label>
+        <input class="fact" placeholder="e.g. What does it eat?">
+      </div>
+      <button class="btn btn-coral" onclick="finishTeacher()">4. I'm Done Teaching!</button>
+      <div class="hint" id="teacherMsg"></div>
+    </div>
+
+  </div>
+</div>
+
+<footer>🏆 Great job! You explored, learned, played and used English today! ⭐ &nbsp; See you next time! ✨</footer>
+
+<script>
+/* ---------- helper to build multiple-choice quizzes ---------- */
+function buildQuiz(containerId, questions, onAnswer){
+  const box = document.getElementById(containerId);
+  questions.forEach((q,qi)=>{
+    const qEl = document.createElement('div');
+    qEl.className='qbox';
+    qEl.style.marginBottom='8px';
+    qEl.innerHTML = `<p class="q">${qi+1}. ${q.q}</p><div class="opts"></div><div class="feedback"></div>`;
+    const optsEl = qEl.querySelector('.opts');
+    q.opts.forEach((optText,oi)=>{
+      const b = document.createElement('button');
+      b.className='opt';
+      b.textContent = optText;
+      b.onclick = ()=>{
+        const allOpts = optsEl.querySelectorAll('.opt');
+        allOpts.forEach(o=>o.disabled=true);
+        const fb = qEl.querySelector('.feedback');
+        if(oi===q.correct){
+          b.classList.add('correct');
+          fb.textContent='Correct! 🎉';
+          fb.className='feedback good';
+          if(onAnswer) onAnswer(true);
+        } else {
+          b.classList.add('wrong');
+          allOpts[q.correct].classList.add('correct');
+          fb.textContent='Not quite — try to remember for next time!';
+          fb.className='feedback bad';
+          if(onAnswer) onAnswer(false);
+        }
+      };
+      optsEl.appendChild(b);
+    });
+    box.appendChild(qEl);
+  });
+}
+
+/* ---------- Section 3 quiz ---------- */
+buildQuiz('quiz3', [
+  {q:'What are penguins?', opts:['fish','birds','mammals'], correct:1},
+  {q:'Where do monkeys live?', opts:['in the sea','in jungles','in the desert'], correct:1},
+  {q:'What is the largest land animal?', opts:['monkey','elephant','rabbit'], correct:1},
+  {q:'What do rabbits eat?', opts:['fish','meat','grass and vegetables'], correct:2},
+  {q:'Who can swim very well?', opts:['monkey','penguin','rabbit','elephant'], correct:1},
+]);
+
+/* ---------- Section 4: sort it out ---------- */
+const sortData = [
+  {name:'Eagle', emoji:'🦅', zone:'fly'},
+  {name:'Penguin', emoji:'🐧', zone:'swim'},
+  {name:'Dolphin', emoji:'🐬', zone:'swim'},
+  {name:'Rabbit', emoji:'🐰', zone:'cant'},
+  {name:'Monkey', emoji:'🐒', zone:'cant'},
+];
+let selectedChip = null;
+function renderBank(){
+  const bank = document.getElementById('sortBank');
+  bank.innerHTML='';
+  sortData.forEach(a=>{
+    if(a.placed) return;
+    const c = document.createElement('div');
+    c.className='chip';
+    c.textContent = a.emoji+' '+a.name;
+    c.onclick = ()=>{
+      document.querySelectorAll('#sortBank .chip').forEach(x=>x.classList.remove('selected'));
+      selectedChip = a;
+      c.classList.add('selected');
+      document.getElementById('sortMsg').textContent = 'Now tap the box where "'+a.name+'" belongs!';
+    };
+    bank.appendChild(c);
+  });
+}
+document.querySelectorAll('.sort-zone').forEach(zone=>{
+  zone.addEventListener('click', ()=>{
+    if(!selectedChip){
+      document.getElementById('sortMsg').textContent='Select an animal first!';
+      return;
+    }
+    const chip = document.createElement('span');
+    chip.className='chip';
+    const correct = selectedChip.zone === zone.dataset.zone;
+    chip.textContent = selectedChip.emoji+' '+selectedChip.name + (correct ? ' ✅' : ' ❌');
+    chip.classList.add(correct ? 'placed-good' : '');
+    if(!correct){ chip.style.background='#FFE3E3'; chip.style.borderColor='#E14545'; }
+    zone.appendChild(chip);
+    document.getElementById('sortMsg').textContent = correct
+      ? selectedChip.name+' is correct! 🎉'
+      : selectedChip.name+' does not belong there — try again next round!';
+    selectedChip.placed = true;
+    selectedChip = null;
+    renderBank();
+  });
+});
+function resetSort(){
+  sortData.forEach(a=>a.placed=false);
+  document.querySelectorAll('.sort-zone').forEach(z=>{
+    const label = z.querySelector('.zlabel');
+    z.innerHTML='';
+    z.appendChild(label);
+  });
+  document.getElementById('sortMsg').textContent='Select an animal above, then choose its box.';
+  renderBank();
+}
+renderBank();
+
+/* ---------- Section 5: Guess Who ---------- */
+const secretAnimals = [
+  {name:'Elephant', emoji:'🐘', fly:false, swim:false, jungle:false, cold:false},
+  {name:'Penguin', emoji:'🐧', fly:false, swim:true, jungle:false, cold:true},
+  {name:'Monkey', emoji:'🐒', fly:false, swim:false, jungle:true, cold:false},
+  {name:'Rabbit', emoji:'🐰', fly:false, swim:false, jungle:false, cold:false},
+  {name:'Dolphin', emoji:'🐬', fly:false, swim:true, jungle:false, cold:false},
+  {name:'Eagle', emoji:'🦅', fly:true, swim:false, jungle:false, cold:false},
+];
+let secret = null;
+function newSecret(){
+  secret = secretAnimals[Math.floor(Math.random()*secretAnimals.length)];
+  document.getElementById('guessLog').textContent = 'Ask a question to get a clue…';
+  document.getElementById('secretMsg').textContent = 'A new secret animal has been chosen 🤫';
+  renderGuessAnimals();
+}
+function askQ(kind){
+  const labels = {fly:'fly',swim:'swim',jungle:'live in a jungle',cold:'live in cold places'};
+  const ans = secret[kind] ? 'Yes.' : 'No.';
+  document.getElementById('guessLog').textContent = 'Does it '+labels[kind]+'? → '+ans;
+}
+function renderGuessAnimals(){
+  const wrap = document.getElementById('guessAnimals');
+  wrap.innerHTML='';
+  secretAnimals.forEach(a=>{
+    const el = document.createElement('div');
+    el.className='g-animal';
+    el.innerHTML = '<span class="emoji">'+a.emoji+'</span>'+a.name;
+    el.onclick = ()=>{
+      document.querySelectorAll('.g-animal').forEach(x=>x.classList.remove('right','wrong'));
+      if(a.name===secret.name){
+        el.classList.add('right');
+        document.getElementById('guessLog').textContent = '🎉 Yes! It was the '+a.name+'!';
+      } else {
+        el.classList.add('wrong');
+        document.getElementById('guessLog').textContent = 'Nope, try asking more questions!';
+      }
+    };
+    wrap.appendChild(el);
+  });
+}
+newSecret();
+
+/* ---------- Section 6: Dice game ---------- */
+const dicePrompts = {
+  1:'I have a ________.',
+  2:"I don't have a ________.",
+  3:'Do you have a ________?',
+  4:'He/She has a ________.',
+  5:'Does he/she have a ________?',
+  6:'What does he/she have?'
+};
+function rollDice(){
+  const n = Math.floor(Math.random()*6)+1;
+  document.getElementById('dieFace').textContent = n;
+  document.getElementById('dicePrompt').textContent = 'Roll '+n+': "'+dicePrompts[n]+'"';
+  document.getElementById('diceAnswer').value='';
+  document.getElementById('diceAnswer').placeholder = 'Example: "'+dicePrompts[n].replace('________','penguin')+'"';
+}
+
+/* ---------- Section 7: Logic time ---------- */
+const clues = [
+  {text:'1. I live in cold places and I can swim. Who am I?', answer:'penguin'},
+  {text:'2. I live in the jungle and I can climb trees. Who am I?', answer:'monkey'},
+  {text:'3. I have long ears and I like carrots. Who am I?', answer:'rabbit'},
+  {text:'4. I am the largest land animal and I have a long trunk. Who am I?', answer:'elephant'},
+];
+const cluesBox = document.getElementById('clues');
+clues.forEach(c=>{
+  const btn = document.createElement('button');
+  btn.className='clue-btn';
+  btn.textContent = c.text;
+  const ans = document.createElement('div');
+  ans.className='clue-answer';
+  ans.innerHTML = `<input type="text" placeholder="your answer"><button class="check">Check</button><span class="mark"></span>`;
+  btn.onclick = ()=>btn.classList.toggle('open');
+  const input = ans.querySelector('input');
+  const mark = ans.querySelector('.mark');
+  ans.querySelector('.check').onclick = ()=>{
+    if(input.value.trim().toLowerCase()===c.answer){
+      mark.textContent='✅'; mark.style.color='var(--good)';
+    } else {
+      mark.textContent='❌'; mark.style.color='var(--bad)';
+    }
+  };
+  cluesBox.appendChild(btn);
+  cluesBox.appendChild(ans);
+});
+
+/* ---------- Section 8: matching game ---------- */
+const pairs = [
+  {id:'cap', left:'1. Capital', right:'Tokyo'},
+  {id:'flag', left:'2. Flag', right:'🇯🇵'},
+  {id:'food', left:'3. Famous Food', right:'Sushi'},
+  {id:'animal', left:'4. Animal', right:'Snow Monkey'},
+];
+const shuffledRight = [...pairs].sort(()=>Math.random()-0.5);
+let matchSelLeft = null;
+const leftCol = document.getElementById('matchLeft');
+const rightCol = document.getElementById('matchRight');
+pairs.forEach(p=>{
+  const el = document.createElement('div');
+  el.className='match-item';
+  el.textContent = p.left;
+  el.dataset.id = p.id;
+  el.onclick = ()=>{
+    if(el.classList.contains('done')) return;
+    document.querySelectorAll('#matchLeft .match-item').forEach(x=>x.classList.remove('sel'));
+    matchSelLeft = p.id;
+    el.classList.add('sel');
+  };
+  leftCol.appendChild(el);
+});
+shuffledRight.forEach(p=>{
+  const el = document.createElement('div');
+  el.className='match-item';
+  el.textContent = p.right;
+  el.dataset.id = p.id;
+  el.onclick = ()=>{
+    if(el.classList.contains('done') || !matchSelLeft) return;
+    const msg = document.getElementById('matchMsg');
+    if(matchSelLeft === el.dataset.id){
+      el.classList.add('done');
+      document.querySelector(`#matchLeft [data-id="${matchSelLeft}"]`).classList.add('done');
+      msg.textContent = 'Great match! 🎉';
+    } else {
+      msg.textContent = 'Not a match — try again!';
+      document.querySelectorAll('#matchLeft .match-item').forEach(x=>x.classList.remove('sel'));
+    }
+    matchSelLeft = null;
+  };
+  rightCol.appendChild(el);
+});
+
+/* ---------- Section 9 quiz w/ score ---------- */
+let score9 = 0;
+buildQuiz('quiz9', [
+  {q:'What is the largest land animal?', opts:['Elephant','Monkey','Rabbit'], correct:0},
+  {q:'Where do penguins live?', opts:['Hot places','Cold places','Deserts'], correct:1},
+  {q:'Which animal can climb trees?', opts:['Penguin','Monkey','Rabbit'], correct:1},
+  {q:'Which country is famous for sushi?', opts:['Korea','Japan','China'], correct:1},
+], (isCorrect)=>{
+  if(isCorrect) score9++;
+  document.getElementById('scorePill').textContent = 'Score: '+score9+' / 4';
+});
+
+/* ---------- Section 10: drawing canvas ---------- */
+const canvas = document.getElementById('drawCanvas');
+const ctx = canvas.getContext('2d');
+let drawColor = '#2b2440';
+function fitCanvas(){
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * devicePixelRatio;
+  canvas.height = rect.height * devicePixelRatio;
+  ctx.scale(devicePixelRatio, devicePixelRatio);
+  ctx.lineWidth = 3;
+  ctx.lineCap='round';
+}
+window.addEventListener('resize', ()=>{ fitCanvas(); });
+setTimeout(fitCanvas, 50);
+let drawing=false;
+function pos(e){
+  const rect = canvas.getBoundingClientRect();
+  const t = e.touches ? e.touches[0] : e;
+  return {x:t.clientX-rect.left, y:t.clientY-rect.top};
+}
+function start(e){ drawing=true; const p=pos(e); ctx.beginPath(); ctx.moveTo(p.x,p.y); e.preventDefault();}
+function move(e){ if(!drawing) return; const p=pos(e); ctx.strokeStyle=drawColor; ctx.lineTo(p.x,p.y); ctx.stroke(); e.preventDefault();}
+function end(){ drawing=false; }
+canvas.addEventListener('mousedown', start);
+canvas.addEventListener('mousemove', move);
+window.addEventListener('mouseup', end);
+canvas.addEventListener('touchstart', start);
+canvas.addEventListener('touchmove', move);
+canvas.addEventListener('touchend', end);
+function setColor(c){ drawColor=c; }
+function clearCanvas(){ ctx.clearRect(0,0,canvas.width,canvas.height); }
+
+function finishTeacher(){
+  document.getElementById('teacherMsg').textContent = '🌟 Great work today! Now play with your friend and ask your question!';
+}
+</script>
+</body>
+</html>
